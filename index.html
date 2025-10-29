@@ -1,194 +1,105 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تسجيل مشاريع مقرر الذكاء الاصطناعي</title>
-    <style>
-        body {
-            font-family: Tahoma, sans-serif;
-            background-color: #f3f6fa;
-            padding: 30px;
-            direction: rtl;
-        }
-        .container {
-            max-width: 600px;
-            margin: auto;
-            background: white;
-            padding: 25px 30px;
-            border-radius: 12px;
-            box-shadow: 0 0 15px rgba(0,0,0,0.1);
-        }
-        h2 {
-            text-align: center;
-            color: #333;
-            margin-bottom: 25px;
-        }
-        label {
-            display: block;
-            font-weight: bold;
-            margin-bottom: 8px;
-        }
-        input[type="text"], textarea {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            margin-bottom: 15px;
-            box-sizing: border-box;
-        }
-        button {
-            width: 100%;
-            padding: 12px;
-            background-color: #007bff;
-            border: none;
-            color: white;
-            font-size: 16px;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-        button:hover {
-            background-color: #0056b3;
-        }
-        button:disabled {
-            background-color: #bbb;
-            cursor: not-allowed;
-        }
-        .message {
-            text-align: center;
-            margin-top: 15px;
-            font-size: 15px;
-        }
-        .error-message {
-            color: red;
-        }
-        .success-message {
-            color: green;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تسجيل مواقع مقرر الذكاء الاصطناعي</title>
+<style>
+body {font-family: Tahoma; background:#f4f6f8; padding:30px;}
+.container{max-width:600px;margin:auto;background:white;padding:25px;border-radius:10px;box-shadow:0 0 10px rgba(0,0,0,0.1);}
+label{font-weight:bold;margin-top:10px;display:block;}
+input,textarea{width:100%;padding:8px;margin-top:5px;margin-bottom:15px;border:1px solid #ccc;border-radius:6px;}
+button{width:100%;padding:10px;background:#007bff;color:white;border:none;border-radius:6px;font-size:16px;cursor:pointer;}
+button:disabled{background:#aaa;}
+.message{text-align:center;margin-top:15px;}
+</style>
 </head>
 <body>
 
 <div class="container">
-    <h2>📘 تسجيل مشاريع مقرر الذكاء الاصطناعي</h2>
-    <form id="registrationForm">
-        <label for="projectName">اسم المشروع / الموقع:</label>
-        <input type="text" id="projectName" name="projectName" required onblur="checkDuplicate('name', this.value, 'nameStatus')">
-        <div id="nameStatus" class="message"></div>
+<h2>🌐 تسجيل مواقع مقرر الذكاء الاصطناعي</h2>
+<form id="form">
+<label>اسم الموقع:</label>
+<input id="siteName" required onblur="check('name', this.value)">
+<div id="nameMsg" class="message"></div>
 
-        <label for="projectLink">رابط المشروع / الموقع:</label>
-        <input type="text" id="projectLink" name="projectLink" required onblur="checkDuplicate('link', this.value, 'linkStatus')">
-        <div id="linkStatus" class="message"></div>
+<label>رابط الموقع:</label>
+<input id="siteLink" required onblur="check('link', this.value)">
+<div id="linkMsg" class="message"></div>
 
-        <label for="members">أسماء الأعضاء المشاركين (افصل بينهم بفاصلة):</label>
-        <textarea id="members" name="members" rows="3" required></textarea>
+<label>أسماء الأعضاء:</label>
+<textarea id="members" rows="3" required></textarea>
 
-        <label for="responsible">اسم المسؤول عن المجموعة:</label>
-        <input type="text" id="responsible" name="responsible" required>
+<label>اسم المسؤول:</label>
+<input id="responsible" required>
 
-        <button type="submit" id="submitBtn">💾 تسجيل المشروع</button>
-        <div id="formMessage" class="message"></div>
-    </form>
+<button type="submit">💾 تسجيل الموقع</button>
+<div id="status" class="message"></div>
+</form>
 </div>
 
 <script>
-    // ⚙️ ضع هنا رابط الـWeb App من Google Apps Script (الذي ينتهي بـ /exec)
-    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzsj_uQP8MyBifw71n9EtUh5oaPPxc_mcHOG8HvcswPBzEg48sTCE-IPStXJc7mDUjf/exec";
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxe6ZRyaLV5RhFAbOMhfXN9GqBZVsqS1BKXS9ii1YxyB0yPOZTo4IZVJE3dNuYQGBJCRw/exec";
 
-    let isNameDuplicate = false;
-    let isLinkDuplicate = false;
+let nameTaken = false, linkTaken = false;
 
-    function updateSubmitButton() {
-        document.getElementById('submitBtn').disabled = (isNameDuplicate || isLinkDuplicate);
-    }
-
-    async function checkDuplicate(type, value, statusId) {
-        const statusEl = document.getElementById(statusId);
-        statusEl.innerHTML = '';
-
-        if (value.trim() === '') return;
-
-        statusEl.innerHTML = '<span style="color:blue;">⏳ جاري التحقق...</span>';
-
-        try {
-            const response = await fetch(WEB_APP_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ action: 'checkDuplicate', type: type, value: value.trim() })
-            });
-
-            const result = await response.json();
-
-            if (result.duplicate) {
-                if (type === 'name') {
-                    isNameDuplicate = true;
-                    statusEl.innerHTML = '<span class="error-message">❌ اسم المشروع محجوز مسبقًا.</span>';
-                } else {
-                    isLinkDuplicate = true;
-                    statusEl.innerHTML = '<span class="error-message">❌ رابط المشروع مستخدم مسبقًا.</span>';
-                }
-            } else {
-                if (type === 'name') {
-                    isNameDuplicate = false;
-                    statusEl.innerHTML = '<span class="success-message">✅ الاسم متاح.</span>';
-                } else {
-                    isLinkDuplicate = false;
-                    statusEl.innerHTML = '<span class="success-message">✅ الرابط متاح.</span>';
-                }
-            }
-        } catch (error) {
-            statusEl.innerHTML = '<span class="error-message">⚠️ فشل الاتصال بالخادم.</span>';
-        }
-
-        updateSubmitButton();
-    }
-
-    document.getElementById("registrationForm").addEventListener("submit", async (e) => {
-        e.preventDefault();
-
-        const formMsg = document.getElementById("formMessage");
-        const submitBtn = document.getElementById("submitBtn");
-
-        if (isNameDuplicate || isLinkDuplicate) {
-            formMsg.innerHTML = '<span class="error-message">⚠️ يرجى تصحيح الأخطاء قبل التسجيل.</span>';
-            return;
-        }
-
-        submitBtn.disabled = true;
-        formMsg.innerHTML = '<span style="color:blue;">🔄 جاري التسجيل...</span>';
-
-        const formData = {
-            action: 'register',
-            projectName: document.getElementById("projectName").value.trim(),
-            projectLink: document.getElementById("projectLink").value.trim(),
-            members: document.getElementById("members").value.trim(),
-            responsible: document.getElementById("responsible").value.trim()
-        };
-
-        try {
-            const response = await fetch(WEB_APP_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(formData)
-            });
-
-            const result = await response.json();
-
-            if (result.success) {
-                formMsg.innerHTML = '<span class="success-message">✅ تم التسجيل بنجاح!</span>';
-                document.getElementById("registrationForm").reset();
-                document.getElementById("nameStatus").innerHTML = '';
-                document.getElementById("linkStatus").innerHTML = '';
-            } else {
-                formMsg.innerHTML = `<span class="error-message">${result.message || '❌ حدث خطأ أثناء التسجيل.'}</span>`;
-            }
-        } catch (error) {
-            formMsg.innerHTML = '<span class="error-message">⚠️ فشل الاتصال بالخادم.</span>';
-        }
-
-        submitBtn.disabled = false;
+async function check(type, value) {
+  if (!value.trim()) return;
+  const msg = document.getElementById(type === 'name' ? 'nameMsg' : 'linkMsg');
+  msg.textContent = '⏳ جاري التحقق...';
+  try {
+    const res = await fetch(WEB_APP_URL, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({action:'checkDuplicate', type, value})
     });
+    const data = await res.json();
+    if (data.duplicate) {
+      msg.innerHTML = '❌ هذا ' + (type === 'name' ? 'الاسم' : 'الرابط') + ' محجوز مسبقاً.';
+      if (type==='name') nameTaken = true; else linkTaken = true;
+    } else {
+      msg.innerHTML = '✅ متاح.';
+      if (type==='name') nameTaken = false; else linkTaken = false;
+    }
+  } catch {
+    msg.textContent = '⚠️ فشل الاتصال بالخادم.';
+  }
+}
+
+document.getElementById('form').addEventListener('submit', async e=>{
+  e.preventDefault();
+  const status = document.getElementById('status');
+  if (nameTaken || linkTaken) {
+    status.textContent = '⚠️ يرجى تصحيح الأخطاء قبل التسجيل.';
+    return;
+  }
+  const data = {
+    action:'register',
+    siteName:siteName.value.trim(),
+    siteLink:siteLink.value.trim(),
+    members:members.value.trim(),
+    responsible:responsible.value.trim()
+  };
+  status.textContent = '⏳ جاري التسجيل...';
+  try {
+    const res = await fetch(WEB_APP_URL, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify(data)
+    });
+    const result = await res.json();
+    if (result.success) {
+      status.innerHTML = '✅ تم تسجيل الموقع بنجاح!';
+      e.target.reset();
+      nameMsg.textContent = '';
+      linkMsg.textContent = '';
+    } else {
+      status.innerHTML = '❌ ' + (result.message || 'حدث خطأ أثناء التسجيل.');
+    }
+  } catch {
+    status.textContent = '⚠️ فشل الاتصال بالخادم.';
+  }
+});
 </script>
 
 </body>

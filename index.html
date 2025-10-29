@@ -5,81 +5,116 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>تسجيل مشاريع مقرر الذكاء الاصطناعي</title>
     <style>
-        /* كود CSS بسيط للتنسيق والتأكد من وضوح رسائل التنبيه */
-        body { font-family: Tahoma, Geneva, sans-serif; background-color: #f4f4f4; padding: 20px; }
-        .container { max-width: 600px; margin: 0 auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-        h2 { text-align: center; color: #333; }
-        label { display: block; margin-bottom: 8px; font-weight: bold; }
-        /* تغيير نمط حقول الإدخال ومنطقة النص */
-        input[type="text"], textarea { width: 100%; padding: 10px; margin-bottom: 20px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
-        button { background-color: #007bff; color: white; padding: 12px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; width: 100%; }
-        button:disabled { background-color: #cccccc; cursor: not-allowed; }
-        .error-message { color: red; font-size: 0.9em; margin-top: -10px; margin-bottom: 10px; }
-        .success-message { color: green; font-size: 0.9em; margin-top: -10px; margin-bottom: 10px; }
-        .form-status-message { font-size: 1.1em; text-align: center; margin-top: 15px; }
+        body {
+            font-family: 'Tahoma', sans-serif;
+            background-color: #f4f4f4;
+            padding: 30px;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        h2 {
+            text-align: center;
+            color: #222;
+        }
+        label {
+            display: block;
+            margin-top: 15px;
+            margin-bottom: 6px;
+            font-weight: bold;
+        }
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 15px;
+        }
+        textarea {
+            resize: vertical;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #007bff;
+            color: white;
+            font-size: 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        button:disabled {
+            background: #aaa;
+            cursor: not-allowed;
+        }
+        .error-message {
+            color: red;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+        .success-message {
+            color: green;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+        .form-status-message {
+            text-align: center;
+            margin-top: 15px;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>تسجيل مشاريع مقرر الذكاء الاصطناعي</h2>
+    <h2>📘 تسجيل مشاريع مقرر الذكاء الاصطناعي</h2>
     <form id="registrationForm">
-        
-        <label for="projectName">اسم الموقع:</label>
+        <label for="projectName">اسم المشروع / الموقع:</label>
         <input type="text" id="projectName" name="projectName" required onblur="checkDuplicate('name', this.value, 'nameStatus')">
-        <div id="nameStatus" class="error-message"></div>
-        
-        <label for="projectLink">رابط الموقع:</label>
+        <div id="nameStatus"></div>
+
+        <label for="projectLink">رابط المشروع / الموقع:</label>
         <input type="text" id="projectLink" name="projectLink" required onblur="checkDuplicate('link', this.value, 'linkStatus')">
-        <div id="linkStatus" class="error-message"></div>
-        
-        <label for="members">أسماء الأعضاء المشاركين (يرجى الفصل بين الأسماء باستخدام فاصلة ','):</label>
+        <div id="linkStatus"></div>
+
+        <label for="members">أسماء الأعضاء المشاركين (افصل بينهم بفاصلة):</label>
         <textarea id="members" name="members" rows="4" required></textarea>
-        
+
         <label for="responsible">اسم المسؤول عن المجموعة:</label>
         <input type="text" id="responsible" name="responsible" required>
-        
-        <button type="submit" id="submitBtn">ارسال</button>
 
+        <button type="submit" id="submitBtn">تسجيل المشروع</button>
         <div id="formMessage" class="form-status-message"></div>
     </form>
 </div>
 
 <script>
-    // 🚀 رابط الـ Web App URL الذي قدمته
-    const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzq1lcEx6cbM4_0naaMYGuHoA_uwIeQ_mm3_XY53RIi-3Ia-Wkx1Am35mnkrbbnuDkg/exec'; 
+    // ⚙️ ضع هنا رابط Google Apps Script بعد النشر
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzGd77ud4lBxNuZTA3pGC7mxoXe7FopLNe-ClArMRJQaaRjTEB2wNL3AUwi5EhLVHfi/exec";
 
     let isNameDuplicate = false;
     let isLinkDuplicate = false;
 
-    // دالة تحديث حالة زر الإرسال بناءً على حالات التكرار
-    function updateSubmitButton() {
-        const submitBtn = document.getElementById('submitBtn');
-        submitBtn.disabled = isNameDuplicate || isLinkDuplicate;
-    }
-
-    // دالة التحقق من التكرار (تعمل عند ترك الحقل - onblur)
+    // 🔍 دالة للتحقق من التكرار
     async function checkDuplicate(type, value, statusId) {
         const statusElement = document.getElementById(statusId);
-        
-        // إعادة تعيين حالة التكرار لهذا النوع
-        if (type === 'name') isNameDuplicate = false;
-        if (type === 'link') isLinkDuplicate = false;
-
-        // مسح الرسالة إذا كان الحقل فارغاً
-        if (value.trim() === '') {
-            statusElement.innerHTML = '';
-            updateSubmitButton();
+        if (!value.trim()) {
+            statusElement.innerHTML = "";
             return;
         }
 
-        // عرض رسالة "جاري التحقق..."
-        statusElement.innerHTML = '<span style="color: blue;">جاري التحقق...</span>';
+        statusElement.innerHTML = '<span style="color:blue;">⏳ جاري التحقق...</span>';
 
         try {
             const response = await fetch(WEB_APP_URL, {
                 method: 'POST',
-                mode: 'cors',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     action: 'checkDuplicate',
@@ -89,82 +124,71 @@
             });
 
             const result = await response.json();
-
             if (result.duplicate) {
-                // 🔴 التنبيه الفوري: تم تعديل هذه الرسالة لتعرض "الموقع محجوز من قبل"
-                statusElement.innerHTML = '❌ <span class="error-message">الموقع محجوز من قبل.</span>';
-                if (type === 'name') isNameDuplicate = true;
-                if (type === 'link') isLinkDuplicate = true;
+                if (type === 'name') {
+                    statusElement.innerHTML = '❌ <span class="error-message">اسم المشروع محجوز مسبقًا.</span>';
+                    isNameDuplicate = true;
+                } else {
+                    statusElement.innerHTML = '❌ <span class="error-message">رابط المشروع مسجل مسبقًا.</span>';
+                    isLinkDuplicate = true;
+                }
             } else {
-                // ✅ في حال عدم التكرار
-                statusElement.innerHTML = (type === 'name') ? '✅ <span class="success-message" style="color: green;">اسم متاح.</span>' : '✅ <span class="success-message" style="color: green;">رابط متاح.</span>';
+                statusElement.innerHTML = '✅ <span class="success-message">متاح.</span>';
+                if (type === 'name') isNameDuplicate = false;
+                if (type === 'link') isLinkDuplicate = false;
             }
-
-        } catch (error) {
-            console.error('فشل في الاتصال بالخادم:', error);
-            statusElement.innerHTML = '⚠️ <span class="error-message">حدث خطأ في التحقق. حاول مجدداً.</span>';
+        } catch (err) {
+            statusElement.innerHTML = '⚠️ <span class="error-message">خطأ في الاتصال بالسيرفر.</span>';
+            console.error(err);
         }
-        
-        // تحديث حالة زر الإرسال بناءً على نتائج التحقق
-        updateSubmitButton();
     }
 
-    // دالة إرسال البيانات النهائية
-    document.getElementById('registrationForm').addEventListener('submit', async function(e) {
+    // 🧾 إرسال النموذج
+    document.getElementById('registrationForm').addEventListener('submit', async function (e) {
         e.preventDefault();
-        
-        const submitBtn = document.getElementById('submitBtn');
         const formMessage = document.getElementById('formMessage');
-        
-        // منع الإرسال إذا كان هناك تكرار تم اكتشافه
+        const submitBtn = document.getElementById('submitBtn');
+
         if (isNameDuplicate || isLinkDuplicate) {
-            formMessage.textContent = 'الرجاء تصحيح الأخطاء قبل الإرسال.';
+            formMessage.innerHTML = '⚠️ الرجاء تصحيح الأخطاء قبل الإرسال.';
             return;
         }
 
-        submitBtn.disabled = true; 
-        formMessage.textContent = 'جاري تسجيل مشروعك...';
-        
         const formData = {
             action: 'register',
             projectName: document.getElementById('projectName').value.trim(),
             projectLink: document.getElementById('projectLink').value.trim(),
-            members: document.getElementById('members').value.trim(), 
+            members: document.getElementById('members').value.trim(),
             responsible: document.getElementById('responsible').value.trim()
         };
+
+        formMessage.innerHTML = '⏳ جاري التسجيل...';
+        submitBtn.disabled = true;
 
         try {
             const response = await fetch(WEB_APP_URL, {
                 method: 'POST',
-                mode: 'cors',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(formData)
             });
 
             const result = await response.json();
-
             if (result.success) {
-                formMessage.innerHTML = '✅ <span style="color: green;">تم تسجيل مشروعك بنجاح! شكراً لك.</span>';
-                document.getElementById('registrationForm').reset(); // مسح النموذج بعد النجاح
-                // مسح رسائل الحالة
-                document.getElementById('nameStatus').innerHTML = ''; 
-                document.getElementById('linkStatus').innerHTML = '';
+                formMessage.innerHTML = '✅ <span style="color:green;">تم تسجيل مشروعك بنجاح!</span>';
+                document.getElementById('registrationForm').reset();
+                document.getElementById('nameStatus').innerHTML = "";
+                document.getElementById('linkStatus').innerHTML = "";
             } else {
-                formMessage.innerHTML = '❌ <span style="color: red;">فشل التسجيل. الرجاء المحاولة مرة أخرى.</span>';
+                formMessage.innerHTML = '❌ <span style="color:red;">' + (result.message || 'فشل التسجيل.') + '</span>';
             }
-
         } catch (error) {
-            console.error('فشل التسجيل النهائي:', error);
-            formMessage.innerHTML = '❌ <span style="color: red;">فشل الاتصال بالخادم. تأكد من اتصالك بالإنترنت.</span>';
+            console.error('خطأ:', error);
+            formMessage.innerHTML = '⚠️ <span style="color:red;">تعذر الاتصال بالخادم.</span>';
         } finally {
             submitBtn.disabled = false;
         }
     });
-
 </script>
+
 </body>
-
 </html>
-
-
-
